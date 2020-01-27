@@ -1,0 +1,5 @@
+{
+  "role-name" : "springbootmock-internal",
+  "description" : "Internal role used for amping",
+  "role" : [ "springbootmock-writer" ]
+}

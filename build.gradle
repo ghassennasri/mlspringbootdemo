@@ -1,0 +1,89 @@
+plugins {
+    id 'org.springframework.boot' version '2.2.4.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+    id "com.avast.gradle.docker-compose" version "0.10.7"
+    id "com.marklogic.ml-gradle" version "3.17.0"
+}
+configurations {
+    mlcp
+}
+
+group = 'com.marklogic.mocks'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "http://developer.marklogic.com/maven2/" }
+}
+
+task waitNodeIsUp{
+    doLast{
+        sleep(15000) //ensure node is up
+    }
+}
+
+task importSampleData(type: com.marklogic.gradle.task.MlcpTask) {
+    classpath = configurations.mlcp
+    command = "IMPORT"
+    database = mlAppConfig.contentDatabaseName
+
+    mode="local"
+    output_collections = "songs_data"
+    input_file_path="data/{images,songs}"
+    output_permissions = "rest-reader,read,rest-writer,update"
+    output_uri_replace = ".*songs,'/songs',.*images,'/images'"
+    //logOutputUri = "/mlcp-log.txt"
+
+}
+waitNodeIsUp.mustRunAfter(composeUp)
+
+task importRdf(type: com.marklogic.gradle.task.MlcpTask) {
+    classpath = configurations.mlcp
+    command = "IMPORT"
+    database = mlAppConfig.contentDatabaseName
+
+    input_file_path = "data/dbpedia60k.nt"
+    input_file_type = "rdf"
+    output_uri_replace = ".*data,'/'"
+    output_collections = "top-songs-semantics"
+    output_permissions = "rest-reader,read,rest-writer,update"
+    logOutputUri = "/mlcp-log.txt"
+}
+importRdf.mustRunAfter(importSampleData)
+task deployDB(dependsOn:[importSampleData,importRdf])
+deployDB.dependsOn mlDeploy
+mlDeploy.dependsOn composeUp,waitNodeIsUp
+mlDeleteResourceTimestampsFile.mustRunAfter(waitNodeIsUp)
+mlPrepareBundles.mustRunAfter(waitNodeIsUp)
+mlDeployApp.mustRunAfter(waitNodeIsUp)
+mlPostDeploy.mustRunAfter(waitNodeIsUp)
+
+importSampleData.mustRunAfter(mlDeploy)
+bootRun.dependsOn deployDB
+
+dockerCompose {
+    waitForTcpPorts = false
+    useComposeFiles = ['docker-compose-1-node.yml']
+    //isRequiredBy(project.tasks.importSampleData)
+}
+
+dependencies {
+    mlcp  "com.marklogic:mlcp:9.0.7"
+    compile group: 'com.marklogic', name: 'marklogic-client-api', version: '5.1.0'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'org.springframework.batch:spring-batch-test'
+    mlcp files("lib")
+}
+
+test {
+    useJUnitPlatform()
+}

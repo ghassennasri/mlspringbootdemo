@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Search songs App</title>
+    <link th:if="${mode == 'development'}" rel="stylesheet" href="../static/bootstrap.css" th:href="@{/bootstrap.css}" />
+    <link th:if="${mode == 'production'}" rel="stylesheet" href="../static/bootstrap.min.css" th:href="@{/bootstrap.min.css}" />
+    <script type="text/javascript" src="scripts.js"></script>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Top Songs Search</a>
+            </div>
+            <p class="navbar-text navbar-right" th:text="'Signed in as ' + ${username}" style="margin-right: 10px;">Signed in as Anonymus</p>
+        </div>
+    </nav>
+</header>
+<section id="cover">
+    <div id="cover-caption">
+        <div id="container" class="container">
+            <div class="row">
+                <div class="col-sm-10 offset-sm-1 text-center">
+                    <h1 class="display-3">Welcome to Top Songs Search</h1>
+                    <div class="info-form">
+                        <form action="/search" class="form-inline justify-content-center">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="ckBirthday" onclick="onClickHandler()" th:checked=false>
+
+                                <label class="form-check-label" for="ckBirthday">
+                                    Birthday Week's Top Songs
+                                </label>
+                            </div>
+
+                            <input type="text"  id="q"  name="q" class="form-control" placeholder="Enter song title/Artist" th:value="${#request.getParameter('q')}"  th:disabled=false>
+
+                            <input type="date" id="birthDate"  name="birthDate" class="form-control" value="1983-01-01" disabled=true>
+
+                            <button type="rest" class="btn btn-outline-dark" id="reset_button" onclick="document.getElementById('q').value = '';">X</button>
+
+                            <button type="submit" class="btn btn-success ">okay, go!</button>
+
+                        </form>
+                    </div>
+                    <br>
+
+                    <a href="#nav-main" class="btn btn-secondary-outline btn-sm" role="button">↓</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div>
+    <div class="row">
+        <div class="col-lg-offset-2 col-lg-8">
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Artist</th>
+                    <th>Title</th>
+                    <th>Week</th>
+                    <th>Genre</th>
+                    <th style="width: 90px"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="matchDoc: ${results.songs }">
+                    <td th:text="${matchDoc.artist }"/>
+                    <td th:text="${matchDoc.title }"/>
+                    <td th:text="${matchDoc.weekending }"/>
+                    <td th:text="${matchDoc.genres }"/>
+
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    <nav aria-label="Pagination" th:if="${page.rangestart ne page.rangeend}">
+        <ul class="pagination justify-content-center font-weight-bold">
+            <li class="page-item" th:classappend="${page.previous eq '0'} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{'javascript:generate_link('+${page.previous lt 2 ? 1 : page.previous}+')'}"
+                   aria-label="Previous" title="Previous Page" data-toggle="tooltip">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item" th:classappend="${i eq page.total + 1} ? 'active'"
+                th:each="i : ${#numbers.sequence( page.rangestart, page.rangeend, 1)}">
+                <a class="page-link" th:href="@{'javascript:generate_link('+${i}+')'}" th:text="${i}"
+                   th:title="${'Page '+ i}" data-toggle="tooltip"></a>
+            </li>
+            <li class="page-item" th:classappend="${page.currpage eq page.totpages} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{'javascript:generate_link('+${page.rangeend}+')'}"
+                   aria-label="Next" title="Next Page" data-toggle="tooltip">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<footer class="footer" style="position: absolute; bottom:0;background-color: #f5f5f5; width: 100%">
+    <div class="container">
+        <p th:text="${#dates.format(datetime, 'dd MMM yyyy HH:mm')}"  class="text-muted">Page was rendered today.</p>
+    </div>
+</footer>
+</body>
+</html>
