@@ -21,7 +21,7 @@ repositories {
 
 task waitNodeIsUp{
     doLast{
-        sleep(15000) //ensure node is up
+        sleep(20000) //ensure node is up
     }
 }
 
