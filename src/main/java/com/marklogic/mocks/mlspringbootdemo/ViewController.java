@@ -25,7 +25,7 @@ public class ViewController {
     }
 
     @RequestMapping("/search")
-    public String index(@RequestParam(value = "q", required = false,defaultValue = "") String query,@RequestParam(value = "birthdayDate", required = false) String birthDate,@RequestParam(value = "page",defaultValue = "1", required = false) Integer page, Model model) {
+    public String index(@RequestParam(value = "q", required = false,defaultValue = "") String query,@RequestParam(value = "birthDate", required = false) String birthDate,@RequestParam(value = "page",defaultValue = "1", required = false) Integer page, Model model) {
 
         SearchResults searchResults=new SearchResults();
         Pagination pagination =new Pagination();

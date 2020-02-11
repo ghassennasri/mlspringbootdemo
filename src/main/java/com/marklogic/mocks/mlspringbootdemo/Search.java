@@ -16,9 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /*
@@ -132,7 +135,9 @@ this.conn=conn;
 
 
 	public SearchResults getBirthdaySong(String date,long start)  {
-		
+
+		Date d=null;
+		Calendar c = Calendar.getInstance();
 		// create a manager for searching
 		QueryManager queryMgr = conn.getClient().newQueryManager();
 		QueryOptionsManager qom =  conn.getClient().newServerConfigManager().newQueryOptionsManager();
@@ -142,9 +147,21 @@ this.conn=conn;
 
 		StructuredQueryBuilder qb = new StructuredQueryBuilder(FULL_OPTIONS);
 
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+		try {
+
+			d = formatter.parse(date);
+		}
+		catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		LocalDateTime firstDayofCurrentMonth = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().with(TemporalAdjusters.firstDayOfMonth());
+		LocalDateTime lastDayofCurrentMonth = firstDayofCurrentMonth.with(TemporalAdjusters.lastDayOfMonth());
+
 		// build a range query
-       StructuredQueryDefinition querydef = qb.and(qb.rangeConstraint("week", StructuredQueryBuilder.Operator.GE, date),
-			   qb.rangeConstraint("week", StructuredQueryBuilder.Operator.LE, "1983-01-16"));
+		StructuredQueryDefinition querydef = qb.and(qb.rangeConstraint("week", StructuredQueryBuilder.Operator.GE, formatter.format(Date.from(firstDayofCurrentMonth.atZone(ZoneId.systemDefault()).toInstant()))),
+			   qb.rangeConstraint("week", StructuredQueryBuilder.Operator.LE, formatter.format(Date.from(lastDayofCurrentMonth.atZone(ZoneId.systemDefault()).toInstant()))));
 
        // create a handle for the search results
        SearchHandle resultsHandle = new SearchHandle();

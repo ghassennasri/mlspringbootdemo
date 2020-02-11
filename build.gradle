@@ -62,7 +62,7 @@ mlDeployApp.mustRunAfter(waitNodeIsUp)
 mlPostDeploy.mustRunAfter(waitNodeIsUp)
 
 importSampleData.mustRunAfter(mlDeploy)
-bootRun.dependsOn deployDB
+//bootRun.dependsOn deployDB
 
 dockerCompose {
     waitForTcpPorts = false

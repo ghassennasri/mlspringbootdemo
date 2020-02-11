@@ -26,17 +26,17 @@
                     <h1 class="display-3">Welcome to Top Songs Search</h1>
                     <div class="info-form">
                         <form action="/search" class="form-inline justify-content-center">
-                            <!--div class="form-check">
+                            <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="" id="ckBirthday" onclick="onClickHandler()" th:checked=false>
 
                                 <label class="form-check-label" for="ckBirthday">
-                                    Birthday Week's Top Songs
+                                    Birthday Month's Top Songs
                                 </label>
-                            </div-->
+                            </div>
 
                             <input type="text"  id="q"  name="q" class="form-control" placeholder="Enter song title/Artist" th:value="${#request.getParameter('q')}"  th:disabled=false>
 
-                            <!--input type="date" id="birthDate"  name="birthDate" class="form-control" value="1983-01-01" disabled=true-->
+                            <input type="date" id="birthDate"  name="birthDate" class="form-control" value="1983-01-01" disabled=true>
 
                             <button type="rest" class="btn btn-outline-dark" id="reset_button" onclick="document.getElementById('q').value = '';">X</button>
 

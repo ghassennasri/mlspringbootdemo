@@ -42,14 +42,6 @@
       "invalid-values": "reject"
     },
     {
-      "scalar-type": "date",
-      "namespace-uri": "http://marklogic.com/MLU/top-songs",
-      "localname": "week",
-      "collation": "",
-      "range-value-positions": false,
-      "invalid-values": "reject"
-    },
-    {
       "scalar-type": "string",
       "namespace-uri": "http://marklogic.com/MLU/top-songs",
       "localname": "genre",

@@ -51,7 +51,8 @@
 </constraint>
     <constraint name="week">
         <range  type="xs:date">
-            <element name="week" ns="http://marklogic.com/MLU/top-songs"/>
+            <attribute ns="" name="last"/>
+            <element ns="http://marklogic.com/MLU/top-songs" name="weeks"/>
         </range>
     </constraint>
 <operator name="sort">
